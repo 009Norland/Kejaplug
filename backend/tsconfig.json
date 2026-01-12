@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "moduleResolution": "bundler",
+    "target": "es2020",
+    "module": "esnext",
+    "outDir": "dist",
+    "rootDir": "src"
+  }
+}

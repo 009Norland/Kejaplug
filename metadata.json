@@ -1,0 +1,8 @@
+
+{
+  "name": "KejaPlug",
+  "description": "Kenya's most trusted digital rental marketplace connecting landlords and tenants directly, eliminating brokers and fake listings.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
