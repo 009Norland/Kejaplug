@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import User from '../models/user';
+import User from '../models/user';  // Remove .js extension
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
@@ -11,17 +11,18 @@ router.post('/register', async (req: Request, res: Response) => {
   try {
     const { email, password, name, type, phone } = req.body;
     
-    //debug: Log  what we received
-    console. log('Request body:', req.body);
+    // Debug: Log what we received
+    console.log('Request body:', req.body);
     console.log('Password:', password);
-
-    //validate required fields
+    
+    // Validate required fields
     if (!email || !password || !name || !type) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: 'Missing required fields',
         received: { email: !!email, password: !!password, name: !!name, type: !!type }
       });
     }
+
     // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {

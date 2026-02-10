@@ -32,7 +32,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSearch, onExplore, onGetSta
               <div className="flex-grow relative">
                 <input 
                   type="text" 
-                  placeholder="Tell KejaPlug AI your dream vibe..."
+                  placeholder="Search by location, price, or amenities..."
                   className="w-full px-8 py-5 bg-stone-800 border-none focus:ring-2 focus:ring-orange-600 rounded-[2rem] text-white font-semibold placeholder-stone-500 outline-none"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -43,7 +43,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSearch, onExplore, onGetSta
                 onClick={() => onSearch(query)}
                 className="bg-orange-700 text-white px-10 py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-orange-600 transition-all shadow-xl shadow-orange-900/20 flex items-center justify-center min-w-[180px] active:scale-95"
               >
-                Deep Search
+                Search
               </button>
             </div>
             <div className="mt-8 flex justify-center gap-8">
@@ -80,8 +80,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSearch, onExplore, onGetSta
                 <div className="w-16 h-16 bg-stone-800 rounded-2xl mx-auto mb-6 flex items-center justify-center text-orange-500 shadow-lg border border-stone-700">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 </div>
-                <h3 className="text-xl font-serif font-bold text-white mb-4">AI Smart Match</h3>
-                <p className="text-stone-400 text-sm">Tell our AI what you need and get immediate, personalized recommendations.</p>
+                <h3 className="text-xl font-serif font-bold text-white mb-4">Smart Match</h3>
+                <p className="text-stone-400 text-sm">Find exactly what you need with our powerful search and filter tools.</p>
             </div>
         </div>
       </section>

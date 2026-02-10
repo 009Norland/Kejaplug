@@ -7,7 +7,6 @@ export const landlordService = {
     return response.data;
   },
 
-  // Update property status
   updatePropertyStatus: async (propertyId: string, status: 'Available' | 'Rented' | 'Under Maintenance') => {
     const response = await api.patch(`/landlord/properties/${propertyId}/status`, { status });
     return response.data;

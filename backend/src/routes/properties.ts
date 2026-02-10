@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import Property from '../models/property';
 import { authMiddleware } from '../middleware/auth';
 import Notification from '../models/notification.model';
+import User from '../models/user'
 
 const router = express.Router();
 
@@ -68,7 +69,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
     await property.save();
      
     // Notify all tenants
-    const tenants = await user.find({ type: 'tenant' }); // Assuming `type` identifies tenants
+    const tenants = await User.find({ type: 'tenant' }); // Assuming `type` identifies tenants
     const notifications = tenants.map((tenant: { _id: any; }) => ({
       userId: tenant._id,
       title: 'New Property Listed!',

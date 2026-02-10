@@ -4,11 +4,10 @@ import { User } from '../types';
 
 interface LandlordDashboardProps {
   currentUser: User;
-  onAddNew: () => void;
-  refreshProperties: () => void; 
+  onAddProperty: () => void;
 }
 
-const LandlordDashboard: React.FC<LandlordDashboardProps> = ({ currentUser, onAddNew}) => {
+const LandlordDashboard: React.FC<LandlordDashboardProps> = ({ currentUser, onAddProperty}) => {
   const [myProperties, setMyProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -86,6 +85,10 @@ const LandlordDashboard: React.FC<LandlordDashboardProps> = ({ currentUser, onAd
     );
   }
 
+  function onAddNew(event: React.MouseEvent<HTMLButtonElement>): void {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
       {/* Header */}
@@ -123,7 +126,7 @@ const LandlordDashboard: React.FC<LandlordDashboardProps> = ({ currentUser, onAd
       {/* Add New Property Button */}
       <div className="mb-8">
         <button
-          onClick={onAddNew}
+          onClick={onAddProperty}
           className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-lg flex items-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,57 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { notificationService } from '../services/notificationservice';
+import React, { useState } from 'react';
+import { AppNotification } from '../types';
 
-interface AppNotification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'new_listing' | 'tenant_interest' | 'system';
-  isRead: boolean;
-  date: string;
+interface NotificationCenterProps {
+  notifications: AppNotification[];
+  onClear: () => void;
 }
 
-const NotificationCenter: React.FC = () => {
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch notifications on component mount
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const data = await notificationService.getNotifications();
-        setNotifications(data);
-      } catch (error) {
-        console.error('Failed to fetch notifications:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNotifications();
-  }, []);
+const NotificationCenter: React.FC<NotificationCenterProps> = ({ notifications, onClear }) => {
+  const [loading, setLoading] = useState(false);
 
   // Clear all notifications
-  const handleClear = async () => {
-    try {
-      await notificationService.clearNotifications(); // Add this method in `notificationservice.ts`
-      setNotifications([]);
-    } catch (error) {
-      console.error('Failed to clear notifications:', error);
-    }
+  const handleClear = () => {
+    onClear();
   };
 
-  // Mark a notification as read
-  const markAsRead = async (id: string) => {
-    try {
-      await notificationService.markAsRead(id); // Add this method in `notificationservice.ts`
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notif.id === id ? { ...notif, isRead: true } : notif
-        )
-      );
-    } catch (error) {
-      console.error('Failed to mark notification as read:', error);
-    }
+  // Mark a notification as read (for now, just local state, but could be extended)
+  const markAsRead = (id: string) => {
+    // Since notifications are passed as props, marking as read would need to be handled in parent
+    // For now, we'll just leave it as is or remove if not needed
   };
 
   if (loading) {

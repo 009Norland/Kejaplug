@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Property, SearchFilters, User } from './types';
+import { Property, SearchFilters, User, AppNotification } from './types';
 import { CITIES, AMENITIES_LIST } from './constants';
 import Layout from './components/layout';
 import PropertyCard from './components/propertycard';
@@ -12,15 +12,6 @@ import LandlordDashboard from './components/landlorddashboard';
 import { getSmartRecommendations } from './services/service';
 import { authService } from './services/authservice';
 import { propertyService } from './services/propertyservice';
-
-export interface AppNotification {
-  id: string;
-  title: string;
-  message: string;
-  date: string;
-  type: 'tenant_interest' | 'new_listing' | 'system';
-  isRead: boolean;
-}
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -150,21 +141,20 @@ const App: React.FC = () => {
     alert("Interest sent! Landlord has been notified.");
   };
 
-  const handlePropertyAdded = (refreshLandlordProperties: () => void) => {
-  fetchProperties(); // Refresh global properties list
-  refreshLandlordProperties(); // Refresh landlord-specific properties
-  setCurrentPage('discover');
-
-  const newNotif: AppNotification = {
-    id: Date.now().toString(),
-    title: 'Property Listed Successfully! 🎉',
-    message: `Your property has been published and is now visible to tenants.`,
-    date: 'Just now',
-    type: 'new_listing',
-    isRead: false,
+  const handlePropertyAdded = () => {
+    fetchProperties(); // Refresh properties list
+    setCurrentPage('discover');
+    
+    const newNotif: AppNotification = {
+      id: Date.now().toString(),
+      title: 'Property Listed Successfully! 🎉',
+      message: `Your property has been published and is now visible to tenants.`,
+      date: 'Just now',
+      type: 'new_listing',
+      isRead: false
+    };
+    setNotifications([newNotif, ...notifications]);
   };
-  setNotifications([newNotif, ...notifications]);
-};
 
   const handleNavigate = (page: string) => {
     // Check if user needs to be logged in
@@ -185,12 +175,16 @@ const App: React.FC = () => {
   };
 
   const handleAuthComplete = (user: User) => {
-  setCurrentUser(user);
-  setShowAuth(false);
-  
-  // Both landlords and tenants go to discover
-  setCurrentPage('discover');
-};
+    setCurrentUser(user);
+    setShowAuth(false);
+    
+    // Role-based navigation
+    if (user.type === 'landlord') {
+      setCurrentPage('dashboard');
+    } else {
+      setCurrentPage('discover');
+    }
+  };
 
   const handleLogout = () => {
     authService.logout();
@@ -208,17 +202,25 @@ const App: React.FC = () => {
       case 'home':
         return <LandingPage onSearch={handleAiSmartSearch} onExplore={() => setCurrentPage('discover')} onGetStarted={() => { setAuthMode('signup'); setShowAuth(true); }} />;
       
+      case 'dashboard':
+        // Landlord Dashboard
+        if (currentUser?.type !== 'landlord') {
+          return (
+            <div className="max-w-4xl mx-auto px-4 py-24 text-center">
+              <div className="bg-red-50 rounded-3xl p-12 border-2 border-red-100">
+                <h2 className="text-3xl font-serif font-bold text-stone-900 mb-4">Access Denied</h2>
+                <p className="text-stone-600">Only landlords can access the dashboard.</p>
+              </div>
+            </div>
+          );
+        }
+        return <LandlordDashboard onAddProperty={() => setCurrentPage('list-property')} currentUser={currentUser!} />;
+
       case 'discover':
-  // Show Landlord Dashboard for landlords
-  if (currentUser?.type === 'landlord') {
-    return (
-      <LandlordDashboard
-        currentUser={currentUser}
-        onAddNew={() => setCurrentPage('list-property')}
-        refreshProperties={fetchProperties} // Pass the callback
-      />
-    );
-  }
+        // Show Landlord Dashboard for landlords
+        if (currentUser?.type === 'landlord') {
+          return <LandlordDashboard currentUser={currentUser!} onAddProperty={() => setCurrentPage('list-property')} />;
+        }
         
         // Show property discover page for tenants
         return (
@@ -309,10 +311,10 @@ const App: React.FC = () => {
         );
       
       case 'list-property':
-        return currentUser ? <PropertyForm onAdd={handlePropertyAdded} currentUser={currentUser} /> : null;
+        return currentUser?.type === 'landlord' ? <PropertyForm onAdd={handlePropertyAdded} /> : null;
       
       case 'notifications':
-        return <NotificationCenter />;
+        return <NotificationCenter notifications={notifications} onClear={() => setNotifications([])} />;
       
       default:
         return null;

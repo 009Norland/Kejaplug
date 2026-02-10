@@ -6,10 +6,9 @@ import { CreatePropertyData, propertyService } from '../services/propertyservice
 
 interface PropertyFormProps {
   onAdd: (propertyData: any) => void;
-  currentUser: User;
 }
 
-const PropertyForm: React.FC<PropertyFormProps> = ({ onAdd, currentUser }) => {
+const PropertyForm: React.FC<PropertyFormProps> = ({ onAdd}) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',

@@ -1,5 +1,5 @@
-import api from './api';
 import { User } from '../types';
+import { authAPI } from './api';
 
 interface LoginData {
   email: string;
@@ -7,85 +7,75 @@ interface LoginData {
 }
 
 interface RegisterData {
+  name: string;
   email: string;
   password: string;
-  name: string;
   type: 'tenant' | 'landlord';
   phone?: string;
 }
 
-interface AuthResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    type: 'tenant' | 'landlord';
-    phone?: string;
-  };
-  message: string;
+// Authentication service using backend API
+class AuthService {
+  private currentUser: User | null = null;
+
+  // Register a new user
+  async register(data: RegisterData): Promise<User> {
+    try {
+      console.log('Registering user with data:', data);
+      const response = await authAPI.register(data);
+      console.log('Registration response:', response);
+      
+      // Convert backend user to frontend User type
+      const user: User = {
+        id: response.user.id,
+        email: response.user.email,
+        name: response.user.name,
+        type: response.user.type,
+        phone: response.user.phone,
+        createdAt: new Date().toISOString()
+      };
+      
+      this.currentUser = user;
+      return user;
+    } catch (error: any) {
+      console.error('Registration error:', error.response?.data || error);
+      throw new Error(error.response?.data?.message || error.message || 'Registration failed');
+    }
+  }
+
+  // Login user
+  async login(data: LoginData): Promise<User> {
+    const response = await authAPI.login(data);
+    
+    // Convert backend user to frontend User type
+    const user: User = {
+      id: response.user.id,
+      email: response.user.email,
+      name: response.user.name,
+      type: response.user.type,
+      phone: response.user.phone,
+      createdAt: new Date().toISOString()
+    };
+    
+    this.currentUser = user;
+    return user;
+  }
+
+  // Logout
+  logout(): void {
+    authAPI.logout();
+    this.currentUser = null;
+  }
+
+  // Get current logged in user
+  getCurrentUser(): User | null {
+    return this.currentUser;
+  }
+
+  // Check if user is logged in
+  isAuthenticated(): boolean {
+    return this.currentUser !== null;
+  }
 }
 
-export const authService = {
-  // Login user
-  login: async (data: LoginData): Promise<User> => {
-    const response = await api.post<AuthResponse>('/auth/login', data);
-    const { token, user } = response.data;
-    
-    // Store token and user in localStorage
-    localStorage.setItem('token', token);
-    const mappedUser: User = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      type: user.type,
-      isVerified: true,
-      phone: user.phone,
-    };
-    localStorage.setItem('user', JSON.stringify(mappedUser));
-    
-    return mappedUser;
-  },
-
-  // Register new user
-  register: async (data: RegisterData): Promise<User> => {
-    const response = await api.post<AuthResponse>('/auth/register', data);
-    const { token, user } = response.data;
-    
-    // Store token and user in localStorage
-    localStorage.setItem('token', token);
-    const mappedUser: User = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      type: user.type,
-      isVerified: true,
-      phone: user.phone,
-    };
-    localStorage.setItem('user', JSON.stringify(mappedUser));
-    
-    return mappedUser;
-  },
-
-  // Get current user from localStorage
-  getCurrentUser: (): User | null => {
-    const userStr = localStorage.getItem('user');
-    if (!userStr) return null;
-    try {
-      return JSON.parse(userStr);
-    } catch {
-      return null;
-    }
-  },
-
-  // Logout user
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  },
-
-  // Check if user is authenticated
-  isAuthenticated: (): boolean => {
-    return !!localStorage.getItem('token');
-  },
-};
+export const authService = new AuthService();

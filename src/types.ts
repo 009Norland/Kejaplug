@@ -56,3 +56,12 @@ export interface SearchFilters {
   type: HouseType | 'All' | string; // Allow any string
   amenities: string[];
 }
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  date: string;
+  type: 'tenant_interest' | 'new_listing' | 'system';
+  isRead: boolean;
+}
