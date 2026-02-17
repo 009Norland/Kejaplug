@@ -1,6 +1,8 @@
 import axios from 'axios';
 
 // Create axios instance with base configuration
+// Use your laptop's IP so all devices can connect
+const API_BASE_URL = 'http://172.27.48.1:5000/api';
 const api = axios.create({
   baseURL: 'http://localhost:5000/api',
   headers: {
@@ -76,15 +78,22 @@ export const propertyAPI = {
 export const authAPI = {
   // Register new user
   register: async (userData: { name: string; email: string; password: string; type: string; phone?: string }) => {
-    const response = await api.post('/auth/register', userData);
-    
-    // Store token
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      (window as any).authToken = response.data.token;
+    try {
+      console.log('API: Registering user:', userData);
+      const response = await api.post('/auth/register', userData);
+      console.log('API: Registration successful:', response.data);
+      
+      // Store token
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        (window as any).authToken = response.data.token;
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('API: Registration failed:', error.response?.data || error);
+      throw error;
     }
-    
-    return response.data;
   },
   
   // Login user
